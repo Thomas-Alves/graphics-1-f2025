@@ -15,18 +15,18 @@ struct Vertex
 // Assignment 1 object 1 -- white triangle (change these vertex colours from red to white)!!!
 static const Vertex vertices_white[3] =
 {
-    { { -0.6f, -0.4f }, { 1.0f, 0.0f, 0.0f } },
-    { {  0.6f, -0.4f }, { 1.0f, 0.0f, 0.0f } },
-    { {   0.f,  0.6f }, { 1.0f, 0.0f, 0.0f } }
+    { { -0.6f, -0.4f }, { 1.0f, 1.0f, 1.0f } },
+    { {  0.6f, -0.4f }, { 1.0f, 1.0f, 1.0f } },
+    { {   0.f,  0.6f }, { 1.0f, 1.0f, 1.0f } }
 };
 
 // Assignment 1 object 2 -- rainbow triangle (done for you)
-//static const Vertex vertices_rainbow[3] =
-//{
-//    { { -0.6f, -0.4f }, { 1.0f, 0.0f, 0.0f } },
-//    { {  0.6f, -0.4f }, { 0.0f, 1.0f, 0.0f } },
-//    { {   0.f,  0.6f }, { 0.0f, 0.0f, 1.0f } }
-//};
+static const Vertex vertices_rainbow[3] =
+{
+    { { -0.7f, -0.3f }, { 1.0f, 0.0f, 0.0f } },
+    { {  0.7f, -0.3f }, { 0.0f, 1.0f, 0.0f } },
+    { {   0.f,  0.9f }, { 0.0f, 0.0f, 1.0f } }
+};
 
 static const Vector2 vertex_positions[3] =
 {
@@ -103,7 +103,7 @@ int main()
     Matrix world = world = MatrixIdentity();
 
     // Generally you want to Scale * Rotate * Translate (order matters)!!!
-    world = MatrixRotateZ(30.0f * DEG2RAD) * MatrixTranslate(0.5f, 0.0f, 0.0f);
+    world = MatrixRotateZ(0.0f * DEG2RAD) * MatrixTranslate(0.0f, 0.0f, 0.0f);
 
     /* Loop until the user closes the window */
     while (!WindowShouldClose())
@@ -117,8 +117,16 @@ int main()
         float b = 190.0f / 255.0f;
         float a = 1.0f;
 
+        
+
         // Time in seconds since GLFW was initialized (use this with functions like sinf and cosf for repeating animations)
         float tt = Time();
+        // x_offset is for when we want to oscillate the triangle form -1 to 1 in case 3
+        float x_offset = sinf(tt);
+        // this is for the angle of which the trangle will turn counter clockwise in case 4
+        float rotationAngle = tt;
+
+        int colorIndex = static_cast<int>(tt) % 3;
 
         /* Render here */
         glClearColor(r, g, b, a);
@@ -150,15 +158,31 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 3);
             break;
 
-        case 2:
+        case 2:// I did two methods of changing color of the triangle i like the first method the best
+            // change to multiple colors acording to the sin wave 
+            r = (sinf(tt * 1.0f) + 1.0f) * 0.5f;
+            g = (sinf(tt * 2.0f) + 1.0f) * 0.5f;
+            b = (sinf(tt * 3.0f) + 1.0f) * 0.5f;
+
+            // change color every second to just red, green, blue every second 
+            //switch (colorIndex)
+            //{
+            //case 0: r = 1.0f; g = 0.0, b = 0.0f; break; // for red
+            //case 1: r = 0.0f; g = 1.0, b = 0.0f; break; // for green 
+            //case 2: r = 0.0f; g = 0.0, b = 1.0f; break; // for blue
+            //}
+
             glUseProgram(a1_tri_shader);
-            glUniform3f(u_color, 0.6, 0.6f, 0.6f);
+            glUniform3f(u_color, r, g, b);
             glUniformMatrix4fv(u_world, 1, GL_FALSE, MatrixToFloat(world));
-            glBindVertexArray(vertex_array_rainbow);
+            glBindVertexArray(vertex_array_white);
             glDrawArrays(GL_TRIANGLES, 0, 3);
             break;
 
         case 3:
+            
+            world = MatrixTranslate(x_offset, 0.0f, 0.0f);
+
             glUseProgram(a1_tri_shader);
             glUniform3f(u_color, 0.4, 0.4f, 0.4f);
             glUniformMatrix4fv(u_world, 1, GL_FALSE, MatrixToFloat(world));
@@ -167,6 +191,9 @@ int main()
             break;
 
         case 4:
+
+            world = MatrixRotateZ(rotationAngle);
+
             glUseProgram(a1_tri_shader);
             glUniform3f(u_color, 0.5, 0.5f, 0.5f);
             glUniformMatrix4fv(u_world, 1, GL_FALSE, MatrixToFloat(world));
