@@ -23,9 +23,9 @@ static const Vertex vertices_white[3] =
 // Assignment 1 object 2 -- rainbow triangle (done for you)
 static const Vertex vertices_rainbow[3] =
 {
-    { { -0.7f, -0.3f }, { 1.0f, 0.0f, 0.0f } },
-    { {  0.7f, -0.3f }, { 0.0f, 1.0f, 0.0f } },
-    { {   0.f,  0.9f }, { 0.0f, 0.0f, 1.0f } }
+    { { -0.6f, -0.4f }, { 1.0f, 0.0f, 0.0f } },
+    { {  0.6f, -0.4f }, { 0.0f, 1.0f, 0.0f } },
+    { {   0.f,  0.6f }, { 0.0f, 0.0f, 1.0f } }
 };
 
 static const Vector2 vertex_positions[3] =
