@@ -68,6 +68,8 @@ int main()
     
     glBindVertexArray(GL_NONE);
 
+    Vector3 color = Vector3UnitX;
+
     while (!WindowShouldClose())
     {
         if (IsKeyPressed(KEY_ESCAPE))
@@ -84,10 +86,19 @@ int main()
         glLineWidth(5.0f);
         glBindVertexArray(vao_line);
 
+        if (IsKeyPressed(KEY_SPACE))
+        {
+            color = Vector3UnitY;
+
+            // Test to see if sub-data works automatically after vao is bound
+            // (Next commit will be using sub-data on a vao that contains multiple vbos)
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(line_vertex_positions2), line_vertex_positions2);
+        }
+
         BeginShader(a2_lines_shader);
         {
             SendMat4(mvp, "u_mvp");
-            SendVec3(Vector3UnitX, "u_color");
+            SendVec3(color, "u_color");
             glDrawArrays(GL_LINES, 0, line_vertex_count);
         }
         EndShader();
