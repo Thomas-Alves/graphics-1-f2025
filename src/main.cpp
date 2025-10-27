@@ -112,11 +112,24 @@ int main()
 
         if (IsKeyPressed(KEY_SPACE))
         {
-            color = Vector3UnitY;
+            //color = Vector3UnitY;
 
             // Test to see if sub-data works automatically after vao is bound
             // (Next commit will be using sub-data on a vao that contains multiple vbos)
-            //glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(line_vertex_positions2), line_vertex_positions2);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_line_positions);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(line_vertex_positions2), line_vertex_positions2);
+            glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+
+            Vector3 new_colors[line_vertex_count];
+            for (int i = 0; i < line_vertex_count; i++)
+            {
+                Vector3 colors[3] = { Vector3UnitX, Vector3UnitY, Vector3UnitZ };
+                new_colors[i] = colors[i % 3];
+            }
+
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_line_colors);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(line_vertex_colors), new_colors);
+            glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
         }
 
         BeginShader(a2_lines_shader);
