@@ -2,6 +2,12 @@
 #include "Shader.h"
 #include <cstdlib>  // For rand
 #include <cstdio>   // For printf
+#include <ctime>    // For time
+
+RMAPI float Random(float min, float max)
+{
+    return min + (rand() / ((float)RAND_MAX / (max - min)));
+}
 
 static const int line_vertex_count = 8;
 static const Vector2 line_vertex_positions[line_vertex_count]
@@ -36,6 +42,20 @@ static const Vector3 line_vertex_colors[line_vertex_count]
 
 int main()
 {
+    // Random number generator example -- % 3 generates random numbers between 0, 1, and 2.
+    // srand "seeds" the random number generator, so your "random sequence" isn't the same every program run.
+    srand(time(nullptr));
+    
+    // 3 random integers between 0 and 2 
+    //int a = rand() % 3;
+    //int b = rand() % 3;
+    //int c = rand() % 3;
+
+    // 3 random floating-points between
+    //float a = Random(0.0f, 1.0f);
+    //float b = Random(0.0f, 1.0f);
+    //float c = Random(0.0f, 1.0f);
+
     Vector2 line_vertex_positions2[8];
 
     line_vertex_positions2[0] = Vector2Lerp(line_vertex_positions[0], line_vertex_positions[1], 0.5f);
