@@ -1,15 +1,6 @@
 #include "Window.h"
 #include "Shader.h"
-
-#include <imgui/imgui.h>
-#include <cstddef>
-#include <cstdlib>
-#include <cstdio>
-#include <ctime>
-
-// 4 lines in 1 square -- each line has 2 vertices, therefore 8 array elements because 4 lines * 2 vertices per line = 8
-// Hint: if 1 square is 8 vertices, and Assignment 2 requires you to render 8 squares, then 8 squares * 8 vertices per square = 64 vertices;
-// (Consider reserving 64 vertices worth of space if you'd like to fit all your positions in a single vertex array)
+#include <iostream>
 
 static const int line_vertex_count = 8;
 static const Vector2 line_vertex_positions[line_vertex_count]
@@ -44,7 +35,6 @@ static const Vector3 line_vertex_colors[line_vertex_count]
 
 int main()
 {
-    // How to form the vertices for the 2nd square:
     Vector2 line_vertex_positions2[8];
 
     line_vertex_positions2[0] = Vector2Lerp(line_vertex_positions[0], line_vertex_positions[1], 0.5f);
@@ -58,7 +48,6 @@ int main()
     
     line_vertex_positions2[6] = Vector2Lerp(line_vertex_positions[6], line_vertex_positions[7], 0.5f);
     line_vertex_positions2[7] = Vector2Lerp(line_vertex_positions[0], line_vertex_positions[1], 0.5f);
-    // (For full marks, you need to automate this with loops or recursion for 8 iterations [meaning 8 squares])
 
     CreateWindow(800, 800, "Graphics 1");
     
@@ -92,8 +81,6 @@ int main()
     
     glBindVertexArray(GL_NONE);
 
-    Vector3 color = Vector3Ones;
-
     while (!WindowShouldClose())
     {
         if (IsKeyPressed(KEY_ESCAPE))
@@ -110,32 +97,9 @@ int main()
         glLineWidth(5.0f);
         glBindVertexArray(vao_line);
 
-        if (IsKeyPressed(KEY_SPACE))
-        {
-            //color = Vector3UnitY;
-
-            // Test to see if sub-data works automatically after vao is bound
-            // (Next commit will be using sub-data on a vao that contains multiple vbos)
-            glBindBuffer(GL_ARRAY_BUFFER, vbo_line_positions);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(line_vertex_positions2), line_vertex_positions2);
-            glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
-            Vector3 new_colors[line_vertex_count];
-            for (int i = 0; i < line_vertex_count; i++)
-            {
-                Vector3 colors[3] = { Vector3UnitX, Vector3UnitY, Vector3UnitZ };
-                new_colors[i] = colors[i % 3];
-            }
-
-            glBindBuffer(GL_ARRAY_BUFFER, vbo_line_colors);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(line_vertex_colors), new_colors);
-            glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-        }
-
         BeginShader(a2_lines_shader);
         {
             SendMat4(mvp, "u_mvp");
-            SendVec3(color, "u_color");
             glDrawArrays(GL_LINES, 0, line_vertex_count);
         }
         EndShader();
