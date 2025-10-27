@@ -27,6 +27,21 @@ static const Vector2 line_vertex_positions[line_vertex_count]
     { -1.0f,  -1.0f }    // bottom-left
 };
 
+static const Vector3 line_vertex_colors[line_vertex_count]
+{
+    Vector3UnitX,
+    Vector3UnitY,
+
+    Vector3UnitZ,
+    Vector3Ones,
+
+    Vector3UnitX,
+    Vector3UnitY,
+
+    Vector3UnitZ,
+    Vector3Ones
+};
+
 int main()
 {
     // How to form the vertices for the 2nd square:
@@ -53,9 +68,14 @@ int main()
 
     GLuint vbo_line_positions;
     glGenBuffers(1, &vbo_line_positions);
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo_line_positions);
     glBufferData(GL_ARRAY_BUFFER, sizeof(line_vertex_positions), line_vertex_positions, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+
+    GLuint vbo_line_colors;
+    glGenBuffers(1, &vbo_line_colors);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_line_colors);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(line_vertex_colors), line_vertex_colors, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
     GLuint vao_line;
@@ -65,10 +85,14 @@ int main()
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_line_positions);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vector2), nullptr);
+
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_line_colors);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), nullptr);
     
     glBindVertexArray(GL_NONE);
 
-    Vector3 color = Vector3UnitX;
+    Vector3 color = Vector3Ones;
 
     while (!WindowShouldClose())
     {
@@ -92,7 +116,7 @@ int main()
 
             // Test to see if sub-data works automatically after vao is bound
             // (Next commit will be using sub-data on a vao that contains multiple vbos)
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(line_vertex_positions2), line_vertex_positions2);
+            //glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(line_vertex_positions2), line_vertex_positions2);
         }
 
         BeginShader(a2_lines_shader);
