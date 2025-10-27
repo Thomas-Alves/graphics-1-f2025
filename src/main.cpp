@@ -1,6 +1,5 @@
 #include "Window.h"
 #include "Shader.h"
-#include "Buffer.h"
 
 #include <imgui/imgui.h>
 #include <cstddef>
@@ -52,20 +51,22 @@ int main()
     GLuint a2_lines_frag = CreateShader(GL_FRAGMENT_SHADER, "./assets/shaders/a2_lines.frag");
     GLuint a2_lines_shader = CreateProgram(a2_lines_vert, a2_lines_frag);
 
-    GLuint vbo_line_positions = GenVertexBuffer();
-    BindVertexBuffer(vbo_line_positions);
-        UpdateVertexBuffer(vbo_line_positions, (void*)line_vertex_positions, sizeof(line_vertex_positions));
-    UnbindVertexBuffer();
+    GLuint vbo_line_positions;
+    glGenBuffers(1, &vbo_line_positions);
 
-    GLuint vao_line = GenVertexArray();
-    BindVertexArray(vao_line);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_line_positions);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(line_vertex_positions), line_vertex_positions, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
-    EnableVertexAttribute(0);
-    BindVertexBuffer(vbo_line_positions);
-    SetVertexAttribute(0, 2, GL_FLOAT, sizeof(Vector2));
+    GLuint vao_line;
+    glGenVertexArrays(1, &vao_line);
+    glBindVertexArray(vao_line);
 
-    UnbindVertexArray();
-    UnbindVertexBuffer();
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_line_positions);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vector2), nullptr);
+    
+    glBindVertexArray(GL_NONE);
 
     while (!WindowShouldClose())
     {
@@ -81,7 +82,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glLineWidth(5.0f);
-        BindVertexArray(vao_line);
+        glBindVertexArray(vao_line);
+
         BeginShader(a2_lines_shader);
         {
             SendMat4(mvp, "u_mvp");
@@ -89,7 +91,8 @@ int main()
             glDrawArrays(GL_LINES, 0, line_vertex_count);
         }
         EndShader();
-        UnbindVertexArray();
+        
+        glBindVertexArray(GL_NONE);
         glLineWidth(1.0f);
 
         BeginGui();

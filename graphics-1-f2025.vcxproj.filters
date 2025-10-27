@@ -51,9 +51,6 @@
     <ClCompile Include="inc\imgui\imgui_widgets.cpp">
       <Filter>Header Files\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\Buffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -91,9 +88,6 @@
     </ClInclude>
     <ClInclude Include="inc\imgui\imgui_impl_opengl3_loader.h">
       <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Buffer.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
