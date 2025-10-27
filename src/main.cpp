@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "Shader.h"
-#include <iostream>
+#include <cstdlib>  // For rand
+#include <cstdio>   // For printf
 
 static const int line_vertex_count = 8;
 static const Vector2 line_vertex_positions[line_vertex_count]
@@ -97,12 +98,11 @@ int main()
         glLineWidth(5.0f);
         glBindVertexArray(vao_line);
 
-        BeginShader(a2_lines_shader);
-        {
-            SendMat4(mvp, "u_mvp");
-            glDrawArrays(GL_LINES, 0, line_vertex_count);
-        }
-        EndShader();
+        int loc_mvp = glGetUniformLocation(a2_lines_shader, "u_mvp");
+        glUseProgram(a2_lines_shader);
+        glUniformMatrix4fv(loc_mvp, 1, GL_FALSE, MatrixToFloat(mvp));
+        glDrawArrays(GL_LINES, 0, line_vertex_count);
+        glUseProgram(GL_NONE);
         
         glBindVertexArray(GL_NONE);
         glLineWidth(1.0f);
