@@ -11,7 +11,7 @@ RMAPI float Random(float min, float max)
     return min + (rand() / ((float)RAND_MAX / (max - min)));
 }
 
-static const int line_vertex_count = 8;
+/*static const int line_vertex_count = 8;
 static const Vector2 line_vertex_positions[line_vertex_count]
 {
     { -1.0f,  -1.0f },   // bottom-left
@@ -27,7 +27,7 @@ static const Vector2 line_vertex_positions[line_vertex_count]
     { -1.0f,  -1.0f }    // bottom-left
 };
 
-static const Vector3 line_vertex_colors[line_vertex_count]
+//static const Vector3 line_vertex_colors[line_vertex_count]
 {
     Vector3UnitX,
     Vector3UnitY,
@@ -40,14 +40,14 @@ static const Vector3 line_vertex_colors[line_vertex_count]
 
     Vector3UnitZ,
     Vector3Ones
-};
+};*/
 
 int main()
 {
     // Random number generator example -- % 3 generates random numbers between 0, 1, and 2.
     // srand "seeds" the random number generator, so your "random sequence" isn't the same every program run.
     srand(time(nullptr));
-    
+
     // 3 random integers between 0 and 2 
     //int a = rand() % 3;
     //int b = rand() % 3;
@@ -58,19 +58,48 @@ int main()
     //float b = Random(0.0f, 1.0f);
     //float c = Random(0.0f, 1.0f);
 
-    Vector2 line_vertex_positions2[8];
+    //Vector2 line_vertex_positions2[8];
 
-    line_vertex_positions2[0] = Vector2Lerp(line_vertex_positions[0], line_vertex_positions[1], 0.5f);
-    line_vertex_positions2[1] = Vector2Lerp(line_vertex_positions[2], line_vertex_positions[3], 0.5f);
+    //line_vertex_positions2[0] = Vector2Lerp(line_vertex_positions[0], line_vertex_positions[1], 0.5f);
+    //line_vertex_positions2[1] = Vector2Lerp(line_vertex_positions[2], line_vertex_positions[3], 0.5f);
 
-    line_vertex_positions2[2] = Vector2Lerp(line_vertex_positions[2], line_vertex_positions[3], 0.5f);
-    line_vertex_positions2[3] = Vector2Lerp(line_vertex_positions[4], line_vertex_positions[5], 0.5f);
+    //line_vertex_positions2[2] = Vector2Lerp(line_vertex_positions[2], line_vertex_positions[3], 0.5f);
+    //line_vertex_positions2[3] = Vector2Lerp(line_vertex_positions[4], line_vertex_positions[5], 0.5f);
 
-    line_vertex_positions2[4] = Vector2Lerp(line_vertex_positions[4], line_vertex_positions[5], 0.5f);
-    line_vertex_positions2[5] = Vector2Lerp(line_vertex_positions[6], line_vertex_positions[7], 0.5f);
-    
-    line_vertex_positions2[6] = Vector2Lerp(line_vertex_positions[6], line_vertex_positions[7], 0.5f);
-    line_vertex_positions2[7] = Vector2Lerp(line_vertex_positions[0], line_vertex_positions[1], 0.5f);
+    //line_vertex_positions2[4] = Vector2Lerp(line_vertex_positions[4], line_vertex_positions[5], 0.5f);
+    //line_vertex_positions2[5] = Vector2Lerp(line_vertex_positions[6], line_vertex_positions[7], 0.5f);
+
+    //line_vertex_positions2[6] = Vector2Lerp(line_vertex_positions[6], line_vertex_positions[7], 0.5f);
+    //line_vertex_positions2[7] = Vector2Lerp(line_vertex_positions[0], line_vertex_positions[1], 0.5f);
+
+    //postions
+    Vector2 trianglePostions[3] = {
+    { -1.0f, -1.0f },   // bottom-left
+    {  1.0f, -1.0f },   // bottom-right
+    { 0.0f, 1.0f} // top 
+    };
+    // colors
+    Vector3 triangleColors[3] = {
+    { 1.0f, 0.0f, 0.0f }, // Red
+    { 0.0f, 1.0f, 0.0f }, // Green
+    { 0.0f, 0.0f, 1.0f }  // Blue
+    };
+
+
+
+    const int vertexAmount = 30000;
+    Vector2 postions[vertexAmount];
+    Vector3 colors[vertexAmount];
+
+    // starrting position 
+    postions[0] = { 0.0f, 0.0f };
+    colors[0] = { 1.0f, 1.0f, 1.0f };
+
+    for (int I = 1; I < vertexAmount; I++) {
+        int n = rand() % 3;
+        postions[I] = Vector2Lerp(postions[I - 1], trianglePostions[n], 0.5f);
+        colors[I] = triangleColors[n];
+    };
 
     CreateWindow(800, 800, "Graphics 1");
     
@@ -78,21 +107,22 @@ int main()
     GLuint a2_lines_frag = CreateShader(GL_FRAGMENT_SHADER, "./assets/shaders/a2_lines.frag");
     GLuint a2_lines_shader = CreateProgram(a2_lines_vert, a2_lines_frag);
 
-    GLuint vbo_line_positions;
+    GLuint vbo_line_positions, vbo_line_colors, vao;
+
     glGenBuffers(1, &vbo_line_positions);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_line_positions);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(line_vertex_positions), line_vertex_positions, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(postions), postions, GL_STATIC_DRAW);
+    // glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
-    GLuint vbo_line_colors;
+    //GLuint vbo_line_colors;
     glGenBuffers(1, &vbo_line_colors);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_line_colors);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(line_vertex_colors), line_vertex_colors, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
-    GLuint vao_line;
-    glGenVertexArrays(1, &vao_line);
-    glBindVertexArray(vao_line);
+    //GLuint vao_line;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
 
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_line_positions);
@@ -118,12 +148,14 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glLineWidth(5.0f);
-        glBindVertexArray(vao_line);
-
-        int loc_mvp = glGetUniformLocation(a2_lines_shader, "u_mvp");
+        glBindVertexArray(vao);
         glUseProgram(a2_lines_shader);
+        int loc_mvp = glGetUniformLocation(a2_lines_shader, "u_mvp");
+        
+
         glUniformMatrix4fv(loc_mvp, 1, GL_FALSE, MatrixToFloat(mvp));
-        glDrawArrays(GL_LINES, 0, line_vertex_count);
+        glPointSize(1.5f);
+        glDrawArrays(GL_POINTS, 0, vertexAmount);
         glUseProgram(GL_NONE);
         
         glBindVertexArray(GL_NONE);
@@ -136,7 +168,7 @@ int main()
         Loop();
     }
 
-    glDeleteVertexArrays(1, &vao_line);
+    glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo_line_positions);
     glDeleteProgram(a2_lines_shader);
     glDeleteShader(a2_lines_frag);
