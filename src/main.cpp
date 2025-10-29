@@ -1,3 +1,5 @@
+// Thomas ALves Midterm Grpahics 
+
 #include "Window.h"
 #include "Shader.h"
 #include <cstdlib>  // For rand
