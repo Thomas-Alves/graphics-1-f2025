@@ -1,6 +1,9 @@
 // Thomas Alves 
 // Date: oct 29, 2025
 // Midterm graphics 
+// I did take this class(failed) last year and I remember doing something like this but I promiss that I did not use any code from my midterm from last year on this.
+// telling you this incase you remember me and think I did not inform you that this could be a possibility becasue I would be sceptical too to be honest.
+// Im also sending the github link to this main.cpp
 
 #include "Window.h"
 #include "Shader.h"
