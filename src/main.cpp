@@ -1,4 +1,6 @@
-// Thomas ALves Midterm Grpahics 
+// Thomas Alves 
+// Date: oct 29, 2025
+// Midterm graphics 
 
 #include "Window.h"
 #include "Shader.h"
