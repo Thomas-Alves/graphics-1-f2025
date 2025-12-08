@@ -18,6 +18,7 @@ enum ShaderType
     SHADER_TYPE_COUNT
 };
 
+
 enum MeshType
 {
     // Platonic solids
@@ -80,6 +81,7 @@ struct Camera
 
 int main()
 {
+
     CreateWindow(800, 800, "Graphics 1");
 
     Mesh meshes[MESH_TYPE_COUNT];
@@ -89,6 +91,9 @@ int main()
     //LoadMeshOctahedron(&meshes[MESH_OCTAHEDRON]);
     //LoadMeshDodecahedron(&meshes[MESH_DODECAHEDRON]);
     //LoadMeshIcosahedron(&meshes[MESH_ICOSAHEDRON]);
+
+    
+
 
     LoadMeshPlane(&meshes[MESH_PLANE]);
     LoadMeshSphere(&meshes[MESH_SPHERE]);
@@ -198,23 +203,63 @@ int main()
         //EndShader();
         // (Replace with A4 draw types within the switch-case below):
 
+       
+       
+
+       
+
         switch (draw_index)
         {
         case A4_PAR_SHAPES_NORMAL_SHADER:
-            break;
+        {
+            BeginShader(shaders[SHADER_NORMAL_COLOR]);
+            SendMat4(mvp, "u_mvp");
+            DrawMesh(meshes[MESH_SPHERE]);   // par_shapes sphere
+            EndShader();
+        }
+        break;
 
         case A4_OBJ_FILE_TCOORDS_SHADER:
-            break;
+        {
+            BeginShader(shaders[SHADER_TCOORD_COLOR]);
+            SendMat4(mvp, "u_mvp");
+            DrawMesh(meshes[MESH_HEAD]);     // OBJ w/ texture coords
+            EndShader();
+        }
+        break;
 
         case A4_CT4_TEXTURE_SHADER:
-            break;
+        {
+            BeginShader(shaders[SHADER_SAMPLE_TEXTURE]);
+            BeginTexture(textures[TEXTURE_GRADIENT_WARM]);
+            SendMat4(mvp, "u_mvp");
+            DrawMesh(meshes[MESH_PLANE]);    // plane w/ texture
+            EndTexture();
+            EndShader();
+        }
+        break;
 
         case A4_MANUAL_MESH:
-            break;
+        {
+            BeginShader(shaders[SHADER_POSITION_COLOR]);
+            SendMat4(mvp, "u_mvp");
+            DrawMesh(manualMesh);
+            EndShader();
+        }
+        break;
 
         case A4_CUSTOM_DRAW:
-            break;
+        {
+           BeginShader(shaders[SHADER_NORMAL_COLOR]);
+           Matrix spin = MatrixRotateY(Time());
+           Matrix alt = spin * view * proj;
+           SendMat4(alt, "u_mvp");
+           DrawMesh(meshes[MESH_HEMISPHERE]);   // your choice
+           EndShader();
         }
+        break;
+        }
+
 
         BeginGui();
         //ImGui::ShowDemoWindow(nullptr);
