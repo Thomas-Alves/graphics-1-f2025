@@ -78,7 +78,7 @@ int main()
     LoadMeshSphere(&meshes[MESH_SPHERE]);
     LoadMeshHemisphere(&meshes[MESH_HEMISPHERE]);
 
-    LoadMeshObj(&meshes[MESH_HEAD], "./assets/meshes/head.obj");
+    LoadMeshObj(&meshes[MESH_HEAD], "./assets/meshes/cube.obj");
     
     GLuint position_color_vert = CreateShader(GL_VERTEX_SHADER, "./assets/shaders/position_color.vert");
     GLuint tcoord_color_vert = CreateShader(GL_VERTEX_SHADER, "./assets/shaders/tcoord_color.vert");

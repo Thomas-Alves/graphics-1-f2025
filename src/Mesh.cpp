@@ -23,17 +23,22 @@ void LoadMeshObj(Mesh* mesh, const char* path)
     mesh->vertex_count = vc;
     mesh->positions.resize(vc);
     mesh->normals.resize(vc);
+    mesh->tcoords.resize(vc);
 
     Vector3* positions = (Vector3*)obj->positions;
     Vector3* normals = (Vector3*)obj->normals;
+    Vector2* tcoords = (Vector2*)obj->texcoords;
     for (size_t i = 0; i < vc; i++)
     {
         fastObjUInt idx_v = obj->indices[i].p;
         fastObjUInt idx_vn = obj->indices[i].n;
+        fastObjUInt idx_vt = obj->indices[i].t;
         Vector3 v = positions[idx_v];
         Vector3 vn = normals[idx_vn];
+        Vector2 vt = tcoords[idx_vt];
         mesh->positions[i] = v;
         mesh->normals[i] = vn;
+        mesh->tcoords[i] = vt;
     }
 
 	fast_obj_destroy(obj);
@@ -145,6 +150,7 @@ void DrawMesh(const Mesh& mesh)
 
 void LoadMeshGPU(Mesh* mesh)
 {
+    // Consider changing empty-checks to assertions because its undefined behaviour (VERY BAD GPU NO LIKE) to sample data that doesn't exist!!!
     assert(!mesh->positions.empty());
     mesh->pbo = CreateBuffer();
     BindVertexBuffer(mesh->pbo);
