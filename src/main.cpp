@@ -8,6 +8,9 @@
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
+//GAME 2012 graphics final prject 
+// Thomas Alves #101422210
+// use t to swithc textures, use wasd to move hozontaly and use space and left shirt to go up or down
 
 enum ShaderType
 {
@@ -116,6 +119,20 @@ int main()
     int mesh_index = MESH_CT4;
     // int mesh_index = MESH_HEAD;
     int texture_index = TEXTURE_WHITE;
+
+    // FOR TASK 2 (LIGHTS)
+    Vector3 dir_light_direction = { -1.0f, -1.0f, -1.0f };   // directional light
+    Vector3 dir_light_color = { 1.0f, 1.0f, 1.0f };
+
+    Vector3 spot_light_position = { 0.0f, 15.0f, 0.0f };       // I did 15 units 
+    Vector3 spot_light_direction = { 0.0f, -1.0f, 0.0f };     // downward
+    Vector3 spot_light_color = { 0.5f, 0.5f, 0.5f };
+    float spot_light_cutoff = cosf(15.0f * DEG2RAD);          // 15° spotlight cone
+
+    Vector3 point_light_color = { 2.0f, 1.2f, 0.6f };         // orange point light
+    float point_light_height = 10.0f;                         // 5 is too short so i put it at ten(Hopefully I dont loose marks or this lol
+    float point_light_radius = 3.0f;                          // i did 3 becasue the mesh is too small too see an effect
+
     while (!WindowShouldClose())
     {
         BeginFrame();
@@ -173,14 +190,23 @@ int main()
 
         Matrix proj = MatrixPerspective(75.0f * DEG2RAD, WindowWidth() / (float)WindowHeight(), 0.01f, 100.0f);
         Matrix view = MatrixInvert(camera_rotation * MatrixTranslate(camera.position.x, camera.position.y, camera.position.z));
-        Matrix world = MatrixIdentity();
+        Matrix world = MatrixScale(0.3f, 0.3f, 0.3f);
         Matrix mvp = world * view * proj;
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Point light animation (circle around xz-plane)
+        float t = Time();
+        Vector3 point_light_position =
+        {
+            cosf(t) * point_light_radius,
+            point_light_height,
+            sinf(t) * point_light_radius
+        };
+
         // Render scene
-        
+
         {
             Matrix ground_world =
                 MatrixRotateX(-PI / 2.0f) *
@@ -199,26 +225,53 @@ int main()
         }
 
 
+        // Animate point light in a circle
+       
         BeginTexture(textures[texture_index]);
-            BeginShader(shaders[shader_index]);
-                SendVec3(light_position, "u_light_position");
-                SendVec3(light_color, "u_light_color");
-                SendMat4(world, "u_world");
-                SendMat4(mvp, "u_mvp");
-                DrawMesh(meshes[mesh_index]);
-            EndShader();
+        BeginShader(shaders[shader_index]);
+
+        // Common uniforms
+        SendMat4(world, "u_world");
+        SendMat4(mvp, "u_mvp");
+
+        // 1) Directional light
+        SendVec3(dir_light_direction, "u_dir_light_direction"); // <- points TOWARD light
+        SendVec3(dir_light_color, "u_dir_light_color");
+
+        // 2) Spotlight
+        SendVec3(spot_light_position, "u_spot_position");
+        SendVec3(spot_light_direction, "u_spot_direction");
+        SendVec3(spot_light_color, "u_spot_color");
+        SendFloat(spot_light_cutoff, "u_spot_cutoff"); // cos(15°)
+
+        // 3) Animated point light
+        SendVec3(point_light_position, "u_point_position");
+        SendVec3(point_light_color, "u_point_color");
+        SendFloat(1.0f, "u_point_constant");
+        SendFloat(0.09f, "u_point_linear");
+        SendFloat(0.032f, "u_point_quadratic");
+
+        // Camera position
+        SendVec3(camera.position, "u_view_pos");
+        DrawMesh(meshes[mesh_index]);
+        EndShader();
         EndTexture();
 
-        // Render light
-        world = MatrixTranslate(light_position.x, light_position.y, light_position.z);
-        mvp = world * view * proj;
+
+        // Render animated point light as a small sphere
+        Matrix light_sphere_world =
+            MatrixTranslate(point_light_position.x, point_light_position.y, point_light_position.z) *
+            MatrixScale(0.5f, 0.5f, 0.5f); // small sphere for light
+        Matrix light_sphere_mvp = light_sphere_world * view * proj;
+
         BeginShader(shaders[SHADER_FLAT]);
-            SendVec3(light_color, "u_color");
-            SendMat4(mvp, "u_mvp");
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                DrawMesh(meshes[MESH_SPHERE]);
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        SendVec3(point_light_color, "u_color");   // use the same color as the point light
+        SendMat4(light_sphere_mvp, "u_mvp");
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe for visibility
+        DrawMesh(meshes[MESH_SPHERE]);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         EndShader();
+
 
         BeginGui();
         ImGui::SliderFloat3("Light Position", &light_position.x, -30.0f, 1.0f);
