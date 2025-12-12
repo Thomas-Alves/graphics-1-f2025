@@ -30,7 +30,8 @@ enum MeshType
 
     // Obj files
     MESH_HEAD,
-
+    //MESH_MUSTANG,
+    MESH_CT4,
     MESH_TYPE_COUNT
 };
 
@@ -78,7 +79,9 @@ int main()
     LoadMeshSphere(&meshes[MESH_SPHERE]);
     LoadMeshHemisphere(&meshes[MESH_HEMISPHERE]);
 
-    LoadMeshObj(&meshes[MESH_HEAD], "./assets/meshes/head.obj");
+    //LoadMeshObj(&meshes[MESH_HEAD], "./assets/meshes/head.obj");
+    //LoadMeshObj(&meshes[MESH_MUSTANG], "./assets/meshes/Mustang.obj");
+    LoadMeshObj(&meshes[MESH_CT4], "./assets/meshes/ct4.obj");
     
     GLuint position_color_vert = CreateShader(GL_VERTEX_SHADER, "./assets/shaders/position_color.vert");
     GLuint tcoord_color_vert = CreateShader(GL_VERTEX_SHADER, "./assets/shaders/tcoord_color.vert");
@@ -105,11 +108,13 @@ int main()
     Camera camera;
     camera.position = { 0.0f, 0.0f, 5.0f };
 
-    Vector3 light_position = Vector3UnitZ * 5.0f;
+    Vector3 light_position = (Vector3UnitZ * 10.0f * 5.0f);
+    
     Vector3 light_color = Vector3Ones;
 
     int shader_index = SHADER_LIGHTING;
-    int mesh_index = MESH_HEAD;
+    int mesh_index = MESH_CT4;
+    // int mesh_index = MESH_HEAD;
     int texture_index = TEXTURE_WHITE;
     while (!WindowShouldClose())
     {
@@ -175,6 +180,25 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render scene
+        
+        {
+            Matrix ground_world =
+                MatrixRotateX(-PI / 2.0f) *
+                MatrixScale(50.0f, 10.0f, 20.0f) *     
+                MatrixTranslate(1.0f, -1.0f, 1.0f);   
+
+            Matrix ground_mvp = ground_world * view * proj;
+
+            BeginShader(shaders[SHADER_FLAT]);
+            Vector3 grey = { 0.5f, 0.5f, 0.5f };     
+            SendVec3(grey, "u_color");
+            SendMat4(ground_mvp, "u_mvp");
+
+            DrawMesh(meshes[MESH_PLANE]);
+            EndShader();
+        }
+
+
         BeginTexture(textures[texture_index]);
             BeginShader(shaders[shader_index]);
                 SendVec3(light_position, "u_light_position");
@@ -197,7 +221,7 @@ int main()
         EndShader();
 
         BeginGui();
-        ImGui::SliderFloat3("Light Position", &light_position.x, -10.0f, 10.0f);
+        ImGui::SliderFloat3("Light Position", &light_position.x, -30.0f, 1.0f);
         ImGui::ColorPicker3("Light Color", &light_color.x);
         //ImGui::ShowDemoWindow(nullptr);
         EndGui();
